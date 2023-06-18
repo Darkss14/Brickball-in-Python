@@ -1,7 +1,7 @@
 import pygame;
 import sys;
 
-#tamaño de pantalla
+#tamano de pantalla
 ANCHO = 640;
 ALTO = 480;
 NOMBRE_DEL_JUEGO = "BrickBall";
@@ -35,7 +35,7 @@ class Bolita(pygame.sprite.Sprite):
         #Evitar que se salga en X
         if self.rect.right >= ANCHO or self.rect.left <= 0:
             self.speed[0] = -self.speed[0];
-        #Mover en base a posición X,Y
+        #Mover en base a posicion X,Y
         self.rect.move_ip(self.speed);
 
 class Jugador(pygame.sprite.Sprite):
@@ -60,6 +60,34 @@ class Jugador(pygame.sprite.Sprite):
         pass;
         self.rect.move_ip(self.speed);
 
+class Ladrillo(pygame.sprite.Sprite):
+    def __init__(self,posicion):
+        pygame.sprite.Sprite.__init__(self);
+        #Cargar imagen
+        self.image = pygame.image.load("sprites/ladrillo.png");
+        self.rect = self.image.get_rect();
+        #Posicion Inicial
+        self.rect.topleft = posicion;
+        #Establecer velocidad 
+        self.speed = [0,0];
+    pass;
+
+class Muro(pygame.sprite.Group):
+    def __init__(self,cantidadLadrillos):
+        pygame.sprite.Group.__init__(self);
+        posX = 0;
+        posY = 20;
+        for i in range(cantidadLadrillos):
+            ladrillo = Ladrillo((posX, posY));
+            self.add(ladrillo);
+            posX = posX + ladrillo.rect.width;
+            if posX >= ANCHO:
+                posX = 0;
+                posY += ladrillo.rect.height;
+            pass;
+        pass;
+
+    pass;
 
 #Inicializando la pantalla
 pantalla = pygame.display.set_mode((ANCHO, ALTO));
@@ -68,6 +96,7 @@ pygame.key.set_repeat(30);
 
 bolita = Bolita();
 jugador = Jugador();
+muro = Muro(50);
 
 while True:
     #Establecer fps
@@ -82,10 +111,13 @@ while True:
     #Actualizar posición de bolita
     bolita.update();
 
+
     pantalla.fill(color_pantalla);
     #Dibujar objetos en Pantalla
     pantalla.blit(bolita.image, bolita.rect);
     pantalla.blit(jugador.image, jugador.rect);
+    #Dibujar Muro
+    muro.draw(pantalla);
     #Actualiza objetos en Pantalla
     pygame.display.flip()
 
